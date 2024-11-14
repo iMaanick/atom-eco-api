@@ -1,6 +1,9 @@
 __all__ = [
-    "CryptoPrice",
-    "CryptoPriceCreate"
+    "Organization",
+    "OrganizationWaste",
+    "WasteType"
 ]
 
-from .crypto_price import CryptoPrice, CryptoPriceCreate
+from .organization import Organization
+from .organization_waste import OrganizationWaste
+from .waste import WasteType

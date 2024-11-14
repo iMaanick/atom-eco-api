@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.application.models.organization import Organization
+from app.application.models import Organization
 from app.application.organizations import get_organizations_data
 from app.application.protocols.database import DatabaseGateway
 

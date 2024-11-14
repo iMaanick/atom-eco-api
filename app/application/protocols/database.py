@@ -1,9 +1,7 @@
-import datetime
 from abc import ABC, abstractmethod
-from typing import Optional
 
-from app.application.models.crypto_price import CryptoPrice, CryptoPriceCreate
-from app.application.models.organization import Organization
+from app.application.models import Organization
+from app.application.models.storage import Storage
 
 
 class UoW(ABC):
@@ -22,3 +20,6 @@ class DatabaseGateway(ABC):
     async def get_organizations(self) -> list[Organization]:
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_storages(self) -> list[Storage]:
+        raise NotImplementedError

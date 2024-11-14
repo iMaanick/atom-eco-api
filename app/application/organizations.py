@@ -1,4 +1,4 @@
-from app.application.models.organization import Organization
+from app.application.models import Organization
 from app.application.protocols.database import DatabaseGateway
 
 
