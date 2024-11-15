@@ -37,3 +37,14 @@ async def delete_organization(
     organization_id = await database.delete_organization_by_id(organization_id)
     await uow.commit()
     return organization_id
+
+
+async def update_organization_by_id(
+        organization_id: int,
+        organization_data: OrganizationCreate,
+        database: DatabaseGateway,
+        uow: UoW,
+) -> int:
+    organization_id = await database.update_organization_by_id(organization_id, organization_data)
+    await uow.commit()
+    return organization_id

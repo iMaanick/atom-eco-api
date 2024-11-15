@@ -1,8 +1,8 @@
 """init
 
-Revision ID: b822e94b7e57
+Revision ID: 2258e2a81a6b
 Revises: 
-Create Date: 2024-11-14 13:17:37.672298
+Create Date: 2024-11-15 16:17:40.632437
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b822e94b7e57'
+revision: str = '2258e2a81a6b'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,21 +25,19 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('location_x', sa.Float(), nullable=False),
     sa.Column('location_y', sa.Float(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('storages',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('location_x', sa.Float(), nullable=False),
     sa.Column('location_y', sa.Float(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('organization_waste',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('organization_id', sa.Integer(), nullable=False),
-    sa.Column('waste_type', sa.Enum('PLASTIC', 'GLASS', 'BIO_WASTE', name='wastetypeenum'), nullable=False),
+    sa.Column('waste_type', sa.Enum('BIO_WASTE', 'GLASS', 'PLASTIC', name='wastetypeenum'), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -47,7 +45,7 @@ def upgrade() -> None:
     op.create_table('storage_capacities',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('storage_id', sa.Integer(), nullable=False),
-    sa.Column('waste_type', sa.Enum('PLASTIC', 'GLASS', 'BIO_WASTE', name='wastetypeenum'), nullable=False),
+    sa.Column('waste_type', sa.Enum('BIO_WASTE', 'GLASS', 'PLASTIC', name='wastetypeenum'), nullable=False),
     sa.Column('capacity', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['storage_id'], ['storages.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -55,7 +53,7 @@ def upgrade() -> None:
     op.create_table('storage_current_levels',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('storage_id', sa.Integer(), nullable=False),
-    sa.Column('waste_type', sa.Enum('PLASTIC', 'GLASS', 'BIO_WASTE', name='wastetypeenum'), nullable=False),
+    sa.Column('waste_type', sa.Enum('BIO_WASTE', 'GLASS', 'PLASTIC', name='wastetypeenum'), nullable=False),
     sa.Column('current_amount', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['storage_id'], ['storages.id'], ),
     sa.PrimaryKeyConstraint('id')

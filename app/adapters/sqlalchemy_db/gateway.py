@@ -54,6 +54,23 @@ class SqlaGateway(DatabaseGateway):
         await self.session.delete(organization)
         return organization.id
 
+    async def update_organization_by_id(self, organization_id: int, organization_data: OrganizationCreate) -> Optional[int]:
+        result = await self.session.execute(
+            select(models.Organization).
+            where(models.Organization.id == organization_id
+                  ).options(selectinload(models.Organization.generated_waste))
+        )
+        organization = result.scalars().first()
+        if not organization:
+            return None
+        organization.name = organization_data.name
+        organization.location_x = organization_data.location_x
+        organization.location_y = organization_data.location_y
+        organization.generated_waste = [
+            models.OrganizationWaste(waste_type=w.waste_type, amount=w.amount) for w in organization_data.generated_waste
+        ]
+        return organization.id
+
     async def get_storages(self) -> list[Storage]:
         query = select(models.Storage).options(
             selectinload(models.Storage.capacities)

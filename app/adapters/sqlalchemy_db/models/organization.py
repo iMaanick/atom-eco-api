@@ -12,7 +12,7 @@ class Organization(Base):
     __tablename__ = 'organizations'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
     location_x: Mapped[float] = mapped_column(Float)
     location_y: Mapped[float] = mapped_column(Float)
 

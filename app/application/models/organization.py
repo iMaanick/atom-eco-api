@@ -27,3 +27,7 @@ class OrganizationCreateResponse(BaseModel):
 
 class DeleteOrganizationResponse(BaseModel):
     detail: str
+
+
+class UpdateOrganizationResponse(BaseModel):
+    detail: str
