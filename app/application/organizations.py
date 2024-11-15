@@ -22,8 +22,10 @@ async def get_organization_data(
 async def add_organization(
         organization_data: OrganizationCreate,
         database: DatabaseGateway,
+        uow: UoW,
 ) -> int:
     organization_id = await database.create_organization(organization_data)
+    await uow.commit()
     return organization_id
 
 

@@ -38,8 +38,7 @@ async def create_organization(
         database: Annotated[DatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> OrganizationCreateResponse:
-    organization_id = await add_organization(organization_data, database)
-    await uow.commit()
+    organization_id = await add_organization(organization_data, database, uow)
     return OrganizationCreateResponse(organization_id=organization_id)
 
 
