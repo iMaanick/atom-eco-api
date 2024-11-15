@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.adapters.sqlalchemy_db import models
-from app.application.models import Organization
+from app.application.models import Organization, OrganizationCreate
 from app.application.models.storage import Storage
 from app.application.protocols.database import DatabaseGateway
 
@@ -28,6 +28,23 @@ class SqlaGateway(DatabaseGateway):
         if organization:
             return Organization.model_validate(organization)
         return None
+
+    async def create_organization(self, organization_data: OrganizationCreate) -> int:
+        new_organization = models.Organization(
+            name=organization_data.name,
+            location_x=organization_data.location_x,
+            location_y=organization_data.location_y,
+            generated_waste=[
+                models.OrganizationWaste(
+                    waste_type=waste_item.waste_type,
+                    amount=waste_item.amount
+                )
+                for waste_item in organization_data.generated_waste
+            ]
+        )
+        self.session.add(new_organization)
+        await self.session.flush()
+        return new_organization.id
 
     async def get_storages(self) -> list[Storage]:
         query = select(models.Storage).options(

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -12,3 +12,14 @@ class Organization(BaseModel):
     location_y: float
     generated_waste: List[OrganizationWaste]
     model_config = ConfigDict(from_attributes=True)
+
+
+class OrganizationCreate(BaseModel):
+    name: str
+    location_x: float
+    location_y: float
+    generated_waste: List[OrganizationWaste]
+
+
+class OrganizationCreateResponse(BaseModel):
+    organization_id: int

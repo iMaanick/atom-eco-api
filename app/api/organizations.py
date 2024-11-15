@@ -1,10 +1,11 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.application.models import Organization
+from app.application.models import Organization, OrganizationCreate
+from app.application.models.organization import OrganizationCreateResponse
 from app.application.organizations import get_organizations_data, get_organization_data
-from app.application.protocols.database import DatabaseGateway
+from app.application.protocols.database import DatabaseGateway, UoW
 
 organizations_router = APIRouter()
 
@@ -26,3 +27,14 @@ async def get_organizations(
     if not organization:
         raise HTTPException(status_code=404, detail="Data not found for specified organization_id.")
     return organization
+
+
+@organizations_router.post("/", response_model=OrganizationCreateResponse)
+async def create_organization(
+        organization_data: OrganizationCreate,
+        database: Annotated[DatabaseGateway, Depends()],
+        uow: Annotated[UoW, Depends()],
+) -> OrganizationCreateResponse:
+    organization_id = await database.create_organization(organization_data)
+    await uow.commit()
+    return OrganizationCreateResponse(organization_id=organization_id)

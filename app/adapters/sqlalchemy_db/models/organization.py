@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class Organization(Base):
     __tablename__ = 'organizations'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, unique=True)
     location_x: Mapped[float] = mapped_column(Float)
     location_y: Mapped[float] = mapped_column(Float)

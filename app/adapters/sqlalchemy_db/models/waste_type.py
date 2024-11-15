@@ -1,7 +1,7 @@
 import enum
 
 
-class WasteTypeEnum(enum.Enum):
-    PLASTIC = "plastic"
-    GLASS = "glass"
-    BIO_WASTE = "bio_waste"
+class WasteTypeEnum(str, enum.Enum):
+    BIO_WASTE = "BIO_WASTE"
+    GLASS = "GLASS"
+    PLASTIC = "PLASTIC"
