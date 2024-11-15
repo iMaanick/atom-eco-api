@@ -1,10 +1,13 @@
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.openapi.models import Response
+from starlette.status import HTTP_204_NO_CONTENT
 
-from app.application.models import Organization, OrganizationCreate
-from app.application.models.organization import OrganizationCreateResponse
-from app.application.organizations import get_organizations_data, get_organization_data, add_organization
+from app.application.models import Organization, OrganizationCreate, OrganizationCreateResponse, \
+    DeleteOrganizationResponse
+from app.application.organizations import get_organizations_data, get_organization_data, add_organization, \
+    delete_organization
 from app.application.protocols.database import DatabaseGateway, UoW
 
 organizations_router = APIRouter()
@@ -38,3 +41,17 @@ async def create_organization(
     organization_id = await add_organization(organization_data, database)
     await uow.commit()
     return OrganizationCreateResponse(organization_id=organization_id)
+
+
+@organizations_router.delete("/", response_model=DeleteOrganizationResponse)
+async def delete_organization_by_id(
+        organization_id: int,
+        database: Annotated[DatabaseGateway, Depends()],
+        uow: Annotated[UoW, Depends()],
+) -> DeleteOrganizationResponse:
+    organization_id = await delete_organization(organization_id, database, uow)
+    if not organization_id:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    return DeleteOrganizationResponse(detail="Organization deleted successfully")
+
+

@@ -1,7 +1,7 @@
 from typing import Optional
 
 from app.application.models import Organization, OrganizationCreate
-from app.application.protocols.database import DatabaseGateway
+from app.application.protocols.database import DatabaseGateway, UoW
 
 
 async def get_organizations_data(
@@ -24,4 +24,14 @@ async def add_organization(
         database: DatabaseGateway,
 ) -> int:
     organization_id = await database.create_organization(organization_data)
+    return organization_id
+
+
+async def delete_organization(
+        organization_id: int,
+        database: DatabaseGateway,
+        uow: UoW,
+) -> Optional[int]:
+    organization_id = await database.delete_organization_by_id(organization_id)
+    await uow.commit()
     return organization_id

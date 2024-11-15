@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -46,7 +46,13 @@ class SqlaGateway(DatabaseGateway):
         await self.session.flush()
         return new_organization.id
 
-    
+    async def delete_organization_by_id(self, organization_id: int) -> Optional[int]:
+        result = await self.session.execute(select(models.Organization).where(models.Organization.id == organization_id))
+        organization = result.scalars().first()
+        if not organization:
+            return None
+        await self.session.delete(organization)
+        return organization.id
 
     async def get_storages(self) -> list[Storage]:
         query = select(models.Storage).options(

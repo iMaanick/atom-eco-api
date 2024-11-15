@@ -23,3 +23,7 @@ class OrganizationCreate(BaseModel):
 
 class OrganizationCreateResponse(BaseModel):
     organization_id: int
+
+
+class DeleteOrganizationResponse(BaseModel):
+    detail: str

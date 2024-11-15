@@ -30,5 +30,9 @@ class DatabaseGateway(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def delete_organization_by_id(self, organization_id: int) -> Optional[int]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_storages(self) -> list[Storage]:
         raise NotImplementedError
