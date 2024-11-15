@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from app.application.models import Organization
 from app.application.models.storage import Storage
@@ -18,6 +19,10 @@ class DatabaseGateway(ABC):
 
     @abstractmethod
     async def get_organizations(self) -> list[Organization]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_organization_by_id(self, organization_id: int) -> Optional[Organization]:
         raise NotImplementedError
 
     @abstractmethod

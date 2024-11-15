@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -17,6 +19,15 @@ class SqlaGateway(DatabaseGateway):
         result = await self.session.execute(query)
         organization_list = [Organization.model_validate(organization) for organization in result.scalars().all()]
         return organization_list
+
+    async def get_organization_by_id(self, organization_id: int) -> Optional[Organization]:
+        query = select(models.Organization).where(models.Organization.id == organization_id).options(
+            selectinload(models.Organization.generated_waste))
+        result = await self.session.execute(query)
+        organization = result.scalars().first()
+        if organization:
+            return Organization.model_validate(organization)
+        return None
 
     async def get_storages(self) -> list[Storage]:
         query = select(models.Storage).options(
