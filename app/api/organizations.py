@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.application.models import Organization, OrganizationCreate
 from app.application.models.organization import OrganizationCreateResponse
-from app.application.organizations import get_organizations_data, get_organization_data
+from app.application.organizations import get_organizations_data, get_organization_data, add_organization
 from app.application.protocols.database import DatabaseGateway, UoW
 
 organizations_router = APIRouter()
@@ -35,6 +35,6 @@ async def create_organization(
         database: Annotated[DatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> OrganizationCreateResponse:
-    organization_id = await database.create_organization(organization_data)
+    organization_id = await add_organization(organization_data, database)
     await uow.commit()
     return OrganizationCreateResponse(organization_id=organization_id)

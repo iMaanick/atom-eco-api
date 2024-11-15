@@ -46,6 +46,8 @@ class SqlaGateway(DatabaseGateway):
         await self.session.flush()
         return new_organization.id
 
+    
+
     async def get_storages(self) -> list[Storage]:
         query = select(models.Storage).options(
             selectinload(models.Storage.capacities)
