@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.adapters.sqlalchemy_db.gateway import StorageSqlaGateway
 from app.api.depends_stub import Stub
 from app.application.models.storage import Storage, StorageCreate, StorageCreateResponse, UpdateStorageResponse, \
     DeleteStorageResponse

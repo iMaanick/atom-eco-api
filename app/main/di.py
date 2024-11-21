@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from app.adapters.sqlalchemy_db.gateway import OrganizationSqlaGateway, StorageSqlaGateway
 from app.api.depends_stub import Stub
-from app.application.protocols.database import UoW, DatabaseGateway, StorageDatabaseGateway
+from app.application.protocols.database import UoW, OrganizationDatabaseGateway, StorageDatabaseGateway
 
 
 async def new_gateway(
@@ -56,7 +56,7 @@ def init_dependencies(app: FastAPI) -> None:
     session_maker = create_session_maker()
 
     app.dependency_overrides[AsyncSession] = partial(new_session, session_maker)
-    app.dependency_overrides[DatabaseGateway] = new_gateway
+    app.dependency_overrides[OrganizationDatabaseGateway] = new_gateway
     app.dependency_overrides[StorageDatabaseGateway] = new_storage_gateway
 
     app.dependency_overrides[UoW] = new_uow

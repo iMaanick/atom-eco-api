@@ -31,3 +31,7 @@ class DeleteOrganizationResponse(BaseModel):
 
 class UpdateOrganizationResponse(BaseModel):
     detail: str
+
+
+class DistanceResponse(BaseModel):
+    distance: float

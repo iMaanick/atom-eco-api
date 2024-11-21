@@ -7,10 +7,10 @@ from sqlalchemy.orm import selectinload
 from app.adapters.sqlalchemy_db import models
 from app.application.models import Organization, OrganizationCreate
 from app.application.models.storage import Storage, StorageCreate
-from app.application.protocols.database import DatabaseGateway, StorageDatabaseGateway
+from app.application.protocols.database import OrganizationDatabaseGateway, StorageDatabaseGateway
 
 
-class OrganizationSqlaGateway(DatabaseGateway):
+class OrganizationSqlaGateway(OrganizationDatabaseGateway):
     def __init__(self, session: AsyncSession):
         self.session = session
 

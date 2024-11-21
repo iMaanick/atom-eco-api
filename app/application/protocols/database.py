@@ -15,7 +15,7 @@ class UoW(ABC):
         raise NotImplementedError
 
 
-class DatabaseGateway(ABC):
+class OrganizationDatabaseGateway(ABC):
 
     @abstractmethod
     async def get_organizations(self) -> list[Organization]:
