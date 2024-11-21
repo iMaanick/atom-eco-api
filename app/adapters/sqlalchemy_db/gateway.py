@@ -7,10 +7,10 @@ from sqlalchemy.orm import selectinload
 from app.adapters.sqlalchemy_db import models
 from app.application.models import Organization, OrganizationCreate
 from app.application.models.storage import Storage
-from app.application.protocols.database import DatabaseGateway
+from app.application.protocols.database import DatabaseGateway, StorageDatabaseGateway
 
 
-class SqlaGateway(DatabaseGateway):
+class OrganizationSqlaGateway(DatabaseGateway):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -47,14 +47,16 @@ class SqlaGateway(DatabaseGateway):
         return new_organization.id
 
     async def delete_organization_by_id(self, organization_id: int) -> Optional[int]:
-        result = await self.session.execute(select(models.Organization).where(models.Organization.id == organization_id))
+        result = await self.session.execute(
+            select(models.Organization).where(models.Organization.id == organization_id))
         organization = result.scalars().first()
         if not organization:
             return None
         await self.session.delete(organization)
         return organization.id
 
-    async def update_organization_by_id(self, organization_id: int, organization_data: OrganizationCreate) -> Optional[int]:
+    async def update_organization_by_id(self, organization_id: int, organization_data: OrganizationCreate) -> Optional[
+        int]:
         result = await self.session.execute(
             select(models.Organization).
             where(models.Organization.id == organization_id
@@ -67,9 +69,15 @@ class SqlaGateway(DatabaseGateway):
         organization.location_x = organization_data.location_x
         organization.location_y = organization_data.location_y
         organization.generated_waste = [
-            models.OrganizationWaste(waste_type=w.waste_type, amount=w.amount) for w in organization_data.generated_waste
+            models.OrganizationWaste(waste_type=w.waste_type, amount=w.amount) for w in
+            organization_data.generated_waste
         ]
         return organization.id
+
+
+class StorageSqlaGateway(StorageDatabaseGateway):
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
     async def get_storages(self) -> list[Storage]:
         query = select(models.Storage).options(

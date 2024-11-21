@@ -20,7 +20,7 @@ async def get_organizations(
 
 
 @organizations_router.get("/{organization_id}", response_model=Organization)
-async def get_organizations(
+async def get_organization(
         organization_id: int,
         database: Annotated[DatabaseGateway, Depends()],
 ) -> Organization:
