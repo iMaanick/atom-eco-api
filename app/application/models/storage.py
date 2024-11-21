@@ -13,3 +13,22 @@ class Storage(BaseModel):
     current_levels: list[StorageCurrentLevel]
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+
+class StorageCreate(BaseModel):
+    name: str
+    location_x: float
+    location_y: float
+    capacities: list[StorageCapacity]
+    current_levels: list[StorageCurrentLevel]
+
+
+class StorageCreateResponse(BaseModel):
+    storage_id: int
+
+
+class UpdateStorageResponse(BaseModel):
+    detail: str
+
+
+class DeleteStorageResponse(BaseModel):
+    detail: str

@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from app.adapters.sqlalchemy_db import models
 from app.application.models import Organization, OrganizationCreate
-from app.application.models.storage import Storage
+from app.application.models.storage import Storage, StorageCreate
 from app.application.protocols.database import DatabaseGateway, StorageDatabaseGateway
 
 
@@ -96,3 +96,60 @@ class StorageSqlaGateway(StorageDatabaseGateway):
         result = await self.session.execute(query)
         storage = result.scalars().first()
         return Storage.model_validate(storage) if storage else None
+
+    async def create_storage(self, storage_data: StorageCreate) -> int:
+        new_storage = models.Storage(
+            name=storage_data.name,
+            location_x=storage_data.location_x,
+            location_y=storage_data.location_y,
+            capacities=[
+                models.StorageCapacity(
+                    waste_type=waste_item.waste_type,
+                    capacity=waste_item.capacity
+                )
+                for waste_item in storage_data.capacities
+            ],
+            current_levels=[
+                models.StorageCurrentLevel(
+                    waste_type=waste_item.waste_type,
+                    current_amount=waste_item.current_amount
+                )
+                for waste_item in storage_data.current_levels
+            ]
+
+        )
+        self.session.add(new_storage)
+        await self.session.flush()
+        return new_storage.id
+
+    async def update_storage_by_id(self, storage_id: int, storage_data: StorageCreate) -> Optional[int]:
+        result = await self.session.execute(
+            select(models.Storage).
+            where(models.Storage.id == storage_id
+                  ).options(
+                selectinload(models.Storage.capacities)
+            ).options(
+                selectinload(models.Storage.current_levels)
+            )
+        )
+        storage = result.scalars().first()
+        if not storage:
+            return None
+        storage.name = storage_data.name
+        storage.location_x = storage_data.location_x
+        storage.location_y = storage_data.location_y
+        storage.capacities = [
+                models.StorageCapacity(
+                    waste_type=waste_item.waste_type,
+                    capacity=waste_item.capacity
+                )
+                for waste_item in storage_data.capacities
+            ]
+        storage.current_levels = [
+                models.StorageCurrentLevel(
+                    waste_type=waste_item.waste_type,
+                    current_amount=waste_item.current_amount
+                )
+                for waste_item in storage_data.current_levels
+            ]
+        return storage.id

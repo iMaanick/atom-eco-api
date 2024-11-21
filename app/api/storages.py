@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.adapters.sqlalchemy_db.gateway import StorageSqlaGateway
 from app.api.depends_stub import Stub
-from app.application.models.storage import Storage
-from app.application.protocols.database import StorageDatabaseGateway
-from app.application.storages import get_storages_data, get_storage_data
+from app.application.models.storage import Storage, StorageCreate, StorageCreateResponse, UpdateStorageResponse
+from app.application.protocols.database import StorageDatabaseGateway, UoW
+from app.application.storages import get_storages_data, get_storage_data, add_storage, update_storage_by_id
 
 storages_router = APIRouter()
 
@@ -28,3 +28,26 @@ async def get_storage(
     if not storage:
         raise HTTPException(status_code=404, detail="Storage not found")
     return storage
+
+
+@storages_router.post("/", response_model=StorageCreateResponse)
+async def create_organization(
+        organization_data: StorageCreate,
+        database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
+        uow: Annotated[UoW, Depends()],
+) -> StorageCreateResponse:
+    storage_id = await add_storage(organization_data, database, uow)
+    return StorageCreateResponse(storage_id=storage_id)
+
+
+@storages_router.put("/{storage_id}/", response_model=UpdateStorageResponse)
+async def update_storage(
+        storage_id: int,
+        storage_data: StorageCreate,
+        database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
+        uow: Annotated[UoW, Depends()],
+) -> UpdateStorageResponse:
+    storage_id = await update_storage_by_id(storage_id, storage_data, database, uow)
+    if not storage_id:
+        raise HTTPException(status_code=404, detail="Storage not found")
+    return UpdateStorageResponse(detail="Storage updated successfully")

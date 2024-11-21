@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from app.application.models import Organization, OrganizationCreate
-from app.application.models.storage import Storage
+from app.application.models.storage import Storage, StorageCreate
 
 
 class UoW(ABC):
@@ -47,4 +47,12 @@ class StorageDatabaseGateway(ABC):
 
     @abstractmethod
     async def get_storage_by_id(self, storage_id: int) -> Optional[Storage]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def create_storage(self, storage_data: StorageCreate) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_storage_by_id(self, storage_id: int, storage_data: StorageCreate) -> Optional[int]:
         raise NotImplementedError
