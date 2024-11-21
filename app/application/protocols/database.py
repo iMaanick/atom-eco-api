@@ -56,3 +56,7 @@ class StorageDatabaseGateway(ABC):
     @abstractmethod
     async def update_storage_by_id(self, storage_id: int, storage_data: StorageCreate) -> Optional[int]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete_storage_by_id(self, storage_id: int) -> Optional[int]:
+        raise NotImplementedError

@@ -139,17 +139,26 @@ class StorageSqlaGateway(StorageDatabaseGateway):
         storage.location_x = storage_data.location_x
         storage.location_y = storage_data.location_y
         storage.capacities = [
-                models.StorageCapacity(
-                    waste_type=waste_item.waste_type,
-                    capacity=waste_item.capacity
-                )
-                for waste_item in storage_data.capacities
-            ]
+            models.StorageCapacity(
+                waste_type=waste_item.waste_type,
+                capacity=waste_item.capacity
+            )
+            for waste_item in storage_data.capacities
+        ]
         storage.current_levels = [
-                models.StorageCurrentLevel(
-                    waste_type=waste_item.waste_type,
-                    current_amount=waste_item.current_amount
-                )
-                for waste_item in storage_data.current_levels
-            ]
+            models.StorageCurrentLevel(
+                waste_type=waste_item.waste_type,
+                current_amount=waste_item.current_amount
+            )
+            for waste_item in storage_data.current_levels
+        ]
+        return storage.id
+
+    async def delete_storage_by_id(self, storage_id: int) -> Optional[int]:
+        result = await self.session.execute(
+            select(models.Storage).where(models.Storage.id == storage_id))
+        storage = result.scalars().first()
+        if not storage:
+            return None
+        await self.session.delete(storage)
         return storage.id
