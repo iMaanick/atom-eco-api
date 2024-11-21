@@ -87,3 +87,12 @@ class StorageSqlaGateway(StorageDatabaseGateway):
         result = await self.session.execute(query)
         storage_list = [Storage.model_validate(storage) for storage in result.scalars().all()]
         return storage_list
+
+    async def get_storage_by_id(self, storage_id: int) -> Optional[Storage]:
+        query = select(models.Storage).where(models.Storage.id == storage_id).options(
+            selectinload(models.Storage.capacities)
+        ).options(
+            selectinload(models.Storage.current_levels))
+        result = await self.session.execute(query)
+        storage = result.scalars().first()
+        return Storage.model_validate(storage) if storage else None

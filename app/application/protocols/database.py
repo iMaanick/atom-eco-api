@@ -44,3 +44,7 @@ class StorageDatabaseGateway(ABC):
     @abstractmethod
     async def get_storages(self) -> list[Storage]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_storage_by_id(self, storage_id: int) -> Optional[Storage]:
+        raise NotImplementedError

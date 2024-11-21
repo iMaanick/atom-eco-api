@@ -5,6 +5,7 @@ from app.application.models.storage_current_level import StorageCurrentLevel
 
 
 class Storage(BaseModel):
+    id: int
     name: str
     location_x: float
     location_y: float
