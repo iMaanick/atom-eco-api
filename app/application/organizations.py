@@ -1,7 +1,8 @@
 import math
 from typing import Optional
 
-from app.application.models import Organization, OrganizationCreate
+from app.application.models import Organization, OrganizationCreate, OrganizationWaste
+from app.application.models.storage import Storage, AvailableStorageResponse
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
 
 
@@ -62,6 +63,53 @@ async def calculate_distance_to_storage(
     storage = await storage_database.get_storage_by_id(storage_id)
     if organization is None or storage is None:
         return None
+    return await calculate_distance(organization, storage)
+
+
+async def get_available_storages_for_organization(
+        organization: Organization,
+        storage_database: StorageDatabaseGateway,
+
+) -> list[AvailableStorageResponse]:
+    storages = await storage_database.get_storages()
+    available_storages = []
+
+    for storage in storages:
+        if has_sufficient_capacity(storage, organization.generated_waste):
+            distance = await calculate_distance(
+                organization,
+                storage,
+            )
+            available_storages.append({
+                "storage_id": storage.id,
+                "name": storage.name,
+                "distance": distance,
+                "capacities": storage.capacities,
+                "current_levels": storage.current_levels
+            })
+    available_storages.sort(key=lambda s: s["distance"])
+    return [AvailableStorageResponse.model_validate(storage) for storage in available_storages]
+
+
+def has_sufficient_capacity(storage: Storage, generated_waste: list[OrganizationWaste]) -> bool:
+    for waste in generated_waste:
+        capacity = next(
+            (cap.capacity for cap in storage.capacities if cap.waste_type == waste.waste_type),
+            0
+        )
+        current_level = next(
+            (level.current_amount for level in storage.current_levels if level.waste_type == waste.waste_type),
+            0
+        )
+        if waste.amount > (capacity - current_level):
+            return False
+    return True
+
+
+async def calculate_distance(
+        organization: Organization,
+        storage: Storage
+) -> float:
     return math.sqrt(
         (organization.location_x - storage.location_x) ** 2 + (organization.location_y - storage.location_y) ** 2
     )

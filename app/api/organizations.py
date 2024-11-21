@@ -6,8 +6,10 @@ from app.api.depends_stub import Stub
 from app.application.models import Organization, OrganizationCreate, OrganizationCreateResponse, \
     DeleteOrganizationResponse, UpdateOrganizationResponse
 from app.application.models.organization import DistanceResponse
+from app.application.models.storage import AvailableStorageResponse
 from app.application.organizations import get_organizations_data, get_organization_data, add_organization, \
-    delete_organization, update_organization_by_id, calculate_distance_to_storage
+    delete_organization, update_organization_by_id, calculate_distance_to_storage, \
+    get_available_storages_for_organization
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
 
 organizations_router = APIRouter()
@@ -81,3 +83,16 @@ async def get_distance_to_storage(
     if distance is None:
         raise HTTPException(status_code=404, detail="Invalid organization or storage")
     return DistanceResponse(distance=distance)
+
+
+@organizations_router.get("/{organization_id}/available-storages/", response_model=list[AvailableStorageResponse])
+async def get_available_storages(
+        organization_id: int,
+        organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
+        storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
+) -> list[AvailableStorageResponse]:
+    organization = await organization_database.get_organization_by_id(organization_id)
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    available_storages = await get_available_storages_for_organization(organization, storage_database)
+    return available_storages

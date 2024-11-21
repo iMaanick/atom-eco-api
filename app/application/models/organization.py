@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from pydantic import BaseModel, ConfigDict
 
@@ -35,3 +35,4 @@ class UpdateOrganizationResponse(BaseModel):
 
 class DistanceResponse(BaseModel):
     distance: float
+

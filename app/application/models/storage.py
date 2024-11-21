@@ -32,3 +32,11 @@ class UpdateStorageResponse(BaseModel):
 
 class DeleteStorageResponse(BaseModel):
     detail: str
+
+
+class AvailableStorageResponse(BaseModel):
+    storage_id: int
+    name: str
+    distance: float
+    capacities: list[StorageCapacity]
+    current_levels: list[StorageCurrentLevel]
