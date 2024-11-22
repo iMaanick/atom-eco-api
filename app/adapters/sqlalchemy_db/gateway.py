@@ -86,6 +86,16 @@ class OrganizationSqlaGateway(OrganizationDatabaseGateway):
 
         await self.session.flush()
 
+    async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+        organization_waste = await self.session.execute(
+            select(models.OrganizationWaste)
+            .where(models.OrganizationWaste.organization_id == organization_id)
+            .where(models.OrganizationWaste.waste_type == waste_type)
+        )
+        organization_waste = organization_waste.scalars().first()
+
+        organization_waste.amount += amount
+
 
 class StorageSqlaGateway(StorageDatabaseGateway):
     def __init__(self, session: AsyncSession):

@@ -6,7 +6,7 @@ from fastapi import Depends
 from app.api.depends_stub import Stub
 from app.application.models import Organization, OrganizationCreate, OrganizationWaste
 from app.application.models.storage import Storage, AvailableStorageResponse
-from app.application.models.waste import WasteTransferRequest
+from app.application.models.waste import WasteTransferRequest, WasteType
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
 
 
@@ -125,7 +125,7 @@ async def transfer_waste(
         transfer_request: WasteTransferRequest,
         organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
         storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
-        uow: Annotated[UoW, Depends()]
+        uow: UoW
 ) -> None:
     await organization_database.reduce_organization_waste(
         organization_id=organization_id,
@@ -140,3 +140,15 @@ async def transfer_waste(
     )
 
     await uow.commit()
+
+
+async def organization_generate_waste(
+        organization_id: int,
+        waste_type: WasteType,
+        amount: float,
+        database: OrganizationDatabaseGateway,
+        uow: UoW
+) -> None:
+    await database.generate_waste(organization_id, waste_type, amount)
+    await uow.commit()
+

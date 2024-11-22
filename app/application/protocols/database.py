@@ -42,6 +42,10 @@ class OrganizationDatabaseGateway(ABC):
     async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
         raise NotImplementedError
 
+    @abstractmethod
+    async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+        raise NotImplementedError
+
 
 class StorageDatabaseGateway(ABC):
 

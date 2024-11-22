@@ -1,16 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.depends_stub import Stub
 from app.application.models import Organization, OrganizationCreate, OrganizationCreateResponse, \
     DeleteOrganizationResponse, UpdateOrganizationResponse, OrganizationWaste
 from app.application.models.organization import DistanceResponse
 from app.application.models.storage import AvailableStorageResponse
-from app.application.models.waste import WasteTransferResponse, WasteTransferRequest
+from app.application.models.waste import WasteTransferResponse, WasteTransferRequest, WasteType, GenerateWasteResponse
 from app.application.organizations import get_organizations_data, get_organization_data, add_organization, \
     delete_organization, update_organization_by_id, calculate_distance_to_storage, \
-    get_available_storages_for_organization, has_sufficient_capacity, transfer_waste
+    get_available_storages_for_organization, has_sufficient_capacity, transfer_waste, organization_generate_waste
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
 from app.application.storages import get_storage_data
 
@@ -112,7 +112,6 @@ async def transfer_waste_to_specific_storage(
         storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()]
 ) -> WasteTransferResponse:
-
     organization = await get_organization_data(organization_id, organization_database)
     if not organization:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -165,4 +164,18 @@ async def transfer_waste_to_specific_storage(
 
     return WasteTransferResponse(
         detail="Waste transferred successfully."
+    )
+
+
+@organizations_router.get("/{organization_id}/generate_waste/", response_model=GenerateWasteResponse)
+async def generate_waste(
+        organization_id: int,
+        waste_type: WasteType,
+        amount: Annotated[float, Query(gt=0)],
+        database: Annotated[OrganizationDatabaseGateway, Depends()],
+        uow: Annotated[UoW, Depends()]
+) -> GenerateWasteResponse:
+    await organization_generate_waste(organization_id, waste_type, amount, database, uow)
+    return GenerateWasteResponse(
+        detail=f"Successfully added {amount} of {waste_type} waste to organization {organization_id}."
     )
