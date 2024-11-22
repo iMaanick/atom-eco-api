@@ -145,7 +145,7 @@ async def transfer_waste(
 async def organization_generate_waste(
         organization_id: int,
         waste_type: WasteType,
-        amount: float,
+        amount: int,
         database: OrganizationDatabaseGateway,
         uow: UoW
 ) -> None:

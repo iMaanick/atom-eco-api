@@ -15,7 +15,7 @@ class WasteTransferResponse(BaseModel):
 
 class WasteTransferRequest(BaseModel):
     waste_type: WasteType = Field(..., description="The type of waste being transferred.")
-    amount: float = Field(..., gt=0, description="The amount of waste to be transferred. Must be greater than 0.")
+    amount: int = Field(..., gt=0, description="The amount of waste to be transferred. Must be greater than 0.")
 
 
 class GenerateWasteResponse(BaseModel):

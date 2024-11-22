@@ -74,7 +74,7 @@ class OrganizationSqlaGateway(OrganizationDatabaseGateway):
         ]
         return organization.id
 
-    async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+    async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: int) -> None:
         organization_waste = await self.session.execute(
             select(models.OrganizationWaste)
             .where(models.OrganizationWaste.organization_id == organization_id)
@@ -86,7 +86,7 @@ class OrganizationSqlaGateway(OrganizationDatabaseGateway):
 
         await self.session.flush()
 
-    async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+    async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: int) -> None:
         organization_waste = await self.session.execute(
             select(models.OrganizationWaste)
             .where(models.OrganizationWaste.organization_id == organization_id)
@@ -185,7 +185,7 @@ class StorageSqlaGateway(StorageDatabaseGateway):
         await self.session.delete(storage)
         return storage.id
 
-    async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: float) -> None:
+    async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: int) -> None:
         storage_level = await self.session.execute(
             select(models.StorageCurrentLevel)
             .where(models.StorageCurrentLevel.storage_id == storage_id)

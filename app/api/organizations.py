@@ -171,7 +171,7 @@ async def transfer_waste_to_specific_storage(
 async def generate_waste(
         organization_id: int,
         waste_type: WasteType,
-        amount: Annotated[float, Query(gt=0)],
+        amount: Annotated[int, Query(gt=0)],
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()]
 ) -> GenerateWasteResponse:

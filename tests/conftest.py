@@ -23,7 +23,7 @@ def mock_uow() -> UoW:
 
 
 @pytest.fixture
-def client(mock_organization_gateway):
+def client(mock_organization_gateway, mock_uow):
     app = FastAPI()
     init_routers(app)
     app.dependency_overrides[OrganizationDatabaseGateway] = lambda: mock_organization_gateway

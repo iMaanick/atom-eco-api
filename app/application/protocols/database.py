@@ -39,11 +39,11 @@ class OrganizationDatabaseGateway(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+    async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: int) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+    async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: int) -> None:
         raise NotImplementedError
 
 
@@ -70,5 +70,5 @@ class StorageDatabaseGateway(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: float) -> None:
+    async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: int) -> None:
         raise NotImplementedError
