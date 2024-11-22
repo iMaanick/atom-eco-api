@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.application.models import Organization, OrganizationCreate
+from app.application.models import Organization, OrganizationCreate, WasteType
 from app.application.models.storage import Storage, StorageCreate
 
 
@@ -38,6 +38,10 @@ class OrganizationDatabaseGateway(ABC):
         int]:
         raise NotImplementedError
 
+    @abstractmethod
+    async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+        raise NotImplementedError
+
 
 class StorageDatabaseGateway(ABC):
 
@@ -59,4 +63,8 @@ class StorageDatabaseGateway(ABC):
 
     @abstractmethod
     async def delete_storage_by_id(self, storage_id: int) -> Optional[int]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: float) -> None:
         raise NotImplementedError

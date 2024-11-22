@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.adapters.sqlalchemy_db import models
-from app.application.models import Organization, OrganizationCreate
+from app.application.models import Organization, OrganizationCreate, WasteType
 from app.application.models.storage import Storage, StorageCreate
 from app.application.protocols.database import OrganizationDatabaseGateway, StorageDatabaseGateway
 
@@ -73,6 +73,18 @@ class OrganizationSqlaGateway(OrganizationDatabaseGateway):
             organization_data.generated_waste
         ]
         return organization.id
+
+    async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: float) -> None:
+        organization_waste = await self.session.execute(
+            select(models.OrganizationWaste)
+            .where(models.OrganizationWaste.organization_id == organization_id)
+            .where(models.OrganizationWaste.waste_type == waste_type)
+        )
+        organization_waste = organization_waste.scalars().first()
+
+        organization_waste.amount -= amount
+
+        await self.session.flush()
 
 
 class StorageSqlaGateway(StorageDatabaseGateway):
@@ -162,3 +174,15 @@ class StorageSqlaGateway(StorageDatabaseGateway):
             return None
         await self.session.delete(storage)
         return storage.id
+
+    async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: float) -> None:
+        storage_level = await self.session.execute(
+            select(models.StorageCurrentLevel)
+            .where(models.StorageCurrentLevel.storage_id == storage_id)
+            .where(models.StorageCurrentLevel.waste_type == waste_type)
+        )
+        storage_level = storage_level.scalars().first()
+
+        storage_level.current_amount += amount
+
+        await self.session.flush()

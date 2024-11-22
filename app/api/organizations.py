@@ -4,13 +4,15 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.depends_stub import Stub
 from app.application.models import Organization, OrganizationCreate, OrganizationCreateResponse, \
-    DeleteOrganizationResponse, UpdateOrganizationResponse
+    DeleteOrganizationResponse, UpdateOrganizationResponse, OrganizationWaste
 from app.application.models.organization import DistanceResponse
 from app.application.models.storage import AvailableStorageResponse
+from app.application.models.waste import WasteTransferResponse, WasteTransferRequest
 from app.application.organizations import get_organizations_data, get_organization_data, add_organization, \
     delete_organization, update_organization_by_id, calculate_distance_to_storage, \
-    get_available_storages_for_organization
+    get_available_storages_for_organization, has_sufficient_capacity
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
+from app.application.storages import get_storage_data
 
 organizations_router = APIRouter()
 
@@ -96,3 +98,76 @@ async def get_available_storages(
         raise HTTPException(status_code=404, detail="Organization not found")
     available_storages = await get_available_storages_for_organization(organization, storage_database)
     return available_storages
+
+
+@organizations_router.post(
+    "{organization_id}/storages/{storage_id}/transfer-waste/",
+    response_model=WasteTransferResponse
+)
+async def transfer_waste_to_specific_storage(
+        organization_id: int,
+        storage_id: int,
+        transfer_request: WasteTransferRequest,
+        organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
+        storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
+        uow: Annotated[UoW, Depends()]
+) -> WasteTransferResponse:
+
+    organization = await get_organization_data(organization_id, organization_database)
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
+    storage = await get_storage_data(storage_id, storage_database)
+    if not storage:
+        raise HTTPException(status_code=404, detail="Storage not found")
+
+    if not any(cap.waste_type == transfer_request.waste_type for cap in storage.capacities):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Storage {storage_id} does not support waste type {transfer_request.waste_type}."
+        )
+
+    if not has_sufficient_capacity(
+            storage,
+            [OrganizationWaste(waste_type=transfer_request.waste_type, amount=transfer_request.amount)]
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Storage {storage_id} does not have sufficient capacity for {transfer_request.amount} of "
+                   f"waste type {transfer_request.waste_type}."
+        )
+
+    organization_waste = next(
+        (w for w in organization.generated_waste if w.waste_type == transfer_request.waste_type),
+        None
+    )
+    if not organization_waste:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Organization {organization_id} does not generate waste type {transfer_request.waste_type}."
+        )
+
+    if organization_waste.amount < transfer_request.amount:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Organization {organization_id} has insufficient waste of type {transfer_request.waste_type}. "
+                   f"Available: {organization_waste.amount}, Requested: {transfer_request.amount}."
+        )
+
+    await organization_database.reduce_organization_waste(
+        organization_id=organization_id,
+        waste_type=transfer_request.waste_type,
+        amount=transfer_request.amount
+    )
+
+    await storage_database.add_waste_to_storage(
+        storage_id=storage_id,
+        waste_type=transfer_request.waste_type,
+        amount=transfer_request.amount
+    )
+
+    await uow.commit()
+
+    return WasteTransferResponse(
+        detail="Waste transferred successfully."
+    )
