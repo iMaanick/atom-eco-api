@@ -91,7 +91,7 @@ async def get_available_storages(
         organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
         storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
 ) -> list[AvailableStorageResponse]:
-    organization = await organization_database.get_organization_by_id(organization_id)
+    organization = await get_organization_data(organization_id, organization_database)
     if not organization:
         raise HTTPException(status_code=404, detail="Organization not found")
     available_storages = await get_available_storages_for_organization(organization, storage_database)
