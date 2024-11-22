@@ -10,7 +10,7 @@ from app.application.models.storage import AvailableStorageResponse
 from app.application.models.waste import WasteTransferResponse, WasteTransferRequest
 from app.application.organizations import get_organizations_data, get_organization_data, add_organization, \
     delete_organization, update_organization_by_id, calculate_distance_to_storage, \
-    get_available_storages_for_organization, has_sufficient_capacity
+    get_available_storages_for_organization, has_sufficient_capacity, transfer_waste
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
 from app.application.storages import get_storage_data
 
@@ -154,19 +154,14 @@ async def transfer_waste_to_specific_storage(
                    f"Available: {organization_waste.amount}, Requested: {transfer_request.amount}."
         )
 
-    await organization_database.reduce_organization_waste(
-        organization_id=organization_id,
-        waste_type=transfer_request.waste_type,
-        amount=transfer_request.amount
+    await transfer_waste(
+        organization_id,
+        storage_id,
+        transfer_request,
+        organization_database,
+        storage_database,
+        uow
     )
-
-    await storage_database.add_waste_to_storage(
-        storage_id=storage_id,
-        waste_type=transfer_request.waste_type,
-        amount=transfer_request.amount
-    )
-
-    await uow.commit()
 
     return WasteTransferResponse(
         detail="Waste transferred successfully."

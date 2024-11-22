@@ -1,8 +1,12 @@
 import math
-from typing import Optional
+from typing import Optional, Annotated
 
+from fastapi import Depends
+
+from app.api.depends_stub import Stub
 from app.application.models import Organization, OrganizationCreate, OrganizationWaste
 from app.application.models.storage import Storage, AvailableStorageResponse
+from app.application.models.waste import WasteTransferRequest
 from app.application.protocols.database import OrganizationDatabaseGateway, UoW, StorageDatabaseGateway
 
 
@@ -113,3 +117,26 @@ async def calculate_distance(
     return math.sqrt(
         (organization.location_x - storage.location_x) ** 2 + (organization.location_y - storage.location_y) ** 2
     )
+
+
+async def transfer_waste(
+        organization_id: int,
+        storage_id: int,
+        transfer_request: WasteTransferRequest,
+        organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
+        storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
+        uow: Annotated[UoW, Depends()]
+) -> None:
+    await organization_database.reduce_organization_waste(
+        organization_id=organization_id,
+        waste_type=transfer_request.waste_type,
+        amount=transfer_request.amount
+    )
+
+    await storage_database.add_waste_to_storage(
+        storage_id=storage_id,
+        waste_type=transfer_request.waste_type,
+        amount=transfer_request.amount
+    )
+
+    await uow.commit()
