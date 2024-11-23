@@ -101,7 +101,7 @@ async def get_available_storages(
 
 
 @organizations_router.post(
-    "{organization_id}/storages/{storage_id}/transfer-waste/",
+    "/{organization_id}/storages/{storage_id}/transfer-waste/",
     response_model=WasteTransferResponse
 )
 async def transfer_waste_to_specific_storage(
@@ -152,7 +152,6 @@ async def transfer_waste_to_specific_storage(
             detail=f"Organization {organization_id} has insufficient waste of type {transfer_request.waste_type}. "
                    f"Available: {organization_waste.amount}, Requested: {transfer_request.amount}."
         )
-
     await transfer_waste(
         organization_id,
         storage_id,
