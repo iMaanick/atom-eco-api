@@ -1,6 +1,5 @@
 from typing import Optional
 
-from app.adapters.sqlalchemy_db.gateway import StorageSqlaGateway
 from app.application.models.storage import Storage, StorageCreate
 from app.application.protocols.database import StorageDatabaseGateway, UoW
 
