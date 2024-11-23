@@ -174,6 +174,9 @@ async def generate_waste(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()]
 ) -> GenerateWasteResponse:
+    organization = await get_organization_data(organization_id, database)
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organization not found")
     await organization_generate_waste(organization_id, waste_type, amount, database, uow)
     return GenerateWasteResponse(
         detail=f"Successfully added {amount} of {waste_type} waste to organization {organization_id}."
