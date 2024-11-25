@@ -21,4 +21,3 @@ venv
 docs.zip
 archive.zip
 .idea/*
-/app/main/test.py
