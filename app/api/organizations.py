@@ -52,8 +52,8 @@ async def delete_organization_by_id(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> DeleteOrganizationResponse:
-    organization_id = await delete_organization(organization_id, database, uow)
-    if not organization_id:
+    deleted_organization_id = await delete_organization(organization_id, database, uow)
+    if not deleted_organization_id:
         raise HTTPException(status_code=404, detail="Organization not found")
     return DeleteOrganizationResponse(detail="Organization deleted successfully")
 
@@ -65,11 +65,11 @@ async def update_organization(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> UpdateOrganizationResponse:
-    organization_id = await update_organization_by_id(organization_id,
+    updated_organization_id = await update_organization_by_id(organization_id,
                                                       organization_data,
                                                       database,
                                                       uow)
-    if not organization_id:
+    if not updated_organization_id:
         raise HTTPException(status_code=404, detail="Organization not found")
     return UpdateOrganizationResponse(detail="Organization updated successfully")
 

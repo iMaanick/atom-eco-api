@@ -40,9 +40,9 @@ async def delete_organization(
         database: OrganizationDatabaseGateway,
         uow: UoW,
 ) -> Optional[int]:
-    organization_id = await database.delete_organization_by_id(organization_id)
+    deleted_organization_id = await database.delete_organization_by_id(organization_id)
     await uow.commit()
-    return organization_id
+    return deleted_organization_id
 
 
 async def update_organization_by_id(
@@ -50,10 +50,10 @@ async def update_organization_by_id(
         organization_data: OrganizationCreate,
         database: OrganizationDatabaseGateway,
         uow: UoW,
-) -> int:
-    organization_id = await database.update_organization_by_id(organization_id, organization_data)
+) -> Optional[int]:
+    updated_organization_id = await database.update_organization_by_id(organization_id, organization_data)
     await uow.commit()
-    return organization_id
+    return updated_organization_id
 
 
 async def calculate_distance_to_storage(
@@ -91,7 +91,7 @@ async def get_available_storages_for_organization(
                 "capacities": storage.capacities,
                 "current_levels": storage.current_levels
             })
-    available_storages.sort(key=lambda s: s["distance"])
+    available_storages.sort(key=lambda s: float(s["distance"]))
     return [AvailableStorageResponse.model_validate(storage) for storage in available_storages]
 
 

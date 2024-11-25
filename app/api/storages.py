@@ -48,8 +48,8 @@ async def update_storage(
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()],
 ) -> UpdateStorageResponse:
-    storage_id = await update_storage_by_id(storage_id, storage_data, database, uow)
-    if not storage_id:
+    updated_storage_id = await update_storage_by_id(storage_id, storage_data, database, uow)
+    if not updated_storage_id:
         raise HTTPException(status_code=404, detail="Storage not found")
     return UpdateStorageResponse(detail="Storage updated successfully")
 
@@ -60,7 +60,7 @@ async def delete_storage(
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()],
 ) -> DeleteStorageResponse:
-    storage_id = await delete_storage_by_id(storage_id, database, uow)
-    if not storage_id:
+    deleted_storage_id = await delete_storage_by_id(storage_id, database, uow)
+    if not deleted_storage_id:
         raise HTTPException(status_code=404, detail="Storage not found")
     return DeleteStorageResponse(detail="Storage deleted successfully")

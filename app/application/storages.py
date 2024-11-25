@@ -34,10 +34,10 @@ async def update_storage_by_id(
         storage_data: StorageCreate,
         database: StorageDatabaseGateway,
         uow: UoW,
-) -> int:
-    storage_id = await database.update_storage_by_id(storage_id, storage_data)
+) -> Optional[int]:
+    updated_storage_id = await database.update_storage_by_id(storage_id, storage_data)
     await uow.commit()
-    return storage_id
+    return updated_storage_id
 
 
 async def delete_storage_by_id(
@@ -45,6 +45,6 @@ async def delete_storage_by_id(
         database: StorageDatabaseGateway,
         uow: UoW,
 ) -> Optional[int]:
-    organization_id = await database.delete_storage_by_id(organization_id)
+    deleted_organization_id = await database.delete_storage_by_id(organization_id)
     await uow.commit()
-    return organization_id
+    return deleted_organization_id

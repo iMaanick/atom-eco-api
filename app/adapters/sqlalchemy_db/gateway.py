@@ -75,26 +75,28 @@ class OrganizationSqlaGateway(OrganizationDatabaseGateway):
         return organization.id
 
     async def reduce_organization_waste(self, organization_id: int, waste_type: WasteType, amount: int) -> None:
-        organization_waste = await self.session.execute(
+        result = await self.session.execute(
             select(models.OrganizationWaste)
             .where(models.OrganizationWaste.organization_id == organization_id)
             .where(models.OrganizationWaste.waste_type == waste_type)
         )
-        organization_waste = organization_waste.scalars().first()
+        organization_waste = result.scalars().first()
 
-        organization_waste.amount -= amount
+        if isinstance(organization_waste, models.OrganizationWaste):
+            organization_waste.amount -= amount
 
         await self.session.flush()
 
     async def generate_waste(self, organization_id: int, waste_type: WasteType, amount: int) -> None:
-        organization_waste = await self.session.execute(
+        result = await self.session.execute(
             select(models.OrganizationWaste)
             .where(models.OrganizationWaste.organization_id == organization_id)
             .where(models.OrganizationWaste.waste_type == waste_type)
         )
-        organization_waste = organization_waste.scalars().first()
+        organization_waste = result.scalars().first()
 
-        organization_waste.amount += amount
+        if isinstance(organization_waste, models.OrganizationWaste):
+            organization_waste.amount += amount
 
 
 class StorageSqlaGateway(StorageDatabaseGateway):
@@ -186,13 +188,14 @@ class StorageSqlaGateway(StorageDatabaseGateway):
         return storage.id
 
     async def add_waste_to_storage(self, storage_id: int, waste_type: WasteType, amount: int) -> None:
-        storage_level = await self.session.execute(
+        result = await self.session.execute(
             select(models.StorageCurrentLevel)
             .where(models.StorageCurrentLevel.storage_id == storage_id)
             .where(models.StorageCurrentLevel.waste_type == waste_type)
         )
-        storage_level = storage_level.scalars().first()
+        storage_level = result.scalars().first()
 
-        storage_level.current_amount += amount
+        if isinstance(storage_level, models.StorageCurrentLevel):
+            storage_level.current_amount += amount
 
         await self.session.flush()
