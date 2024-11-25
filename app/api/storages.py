@@ -16,6 +16,12 @@ storages_router = APIRouter()
 async def get_storages(
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
 ) -> list[Storage]:
+    """
+    Retrieve a list of all storages.
+
+    Returns:
+        list[Storage]: A list of storage objects.
+    """
     storage_list = await get_storages_data(database)
     return storage_list
 
@@ -25,6 +31,15 @@ async def get_storage(
         storage_id: int,
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
 ) -> Storage:
+    """
+    Retrieve a specific storage by its ID.
+
+    Returns:
+        Storage: The storage object corresponding to the specified ID.
+
+    Raises:
+        HTTPException: If the storage is not found.
+    """
     storage = await get_storage_data(storage_id, database)
     if not storage:
         raise HTTPException(status_code=404, detail="Storage not found")
@@ -37,6 +52,12 @@ async def create_organization(
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()],
 ) -> StorageCreateResponse:
+    """
+    Create a new storage.
+
+    Returns:
+        StorageCreateResponse: Response containing the ID of the newly created storage.
+    """
     storage_id = await add_storage(organization_data, database, uow)
     return StorageCreateResponse(storage_id=storage_id)
 
@@ -48,6 +69,15 @@ async def update_storage(
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()],
 ) -> UpdateStorageResponse:
+    """
+    Update an existing storage's details by its ID.
+
+    Returns:
+        UpdateStorageResponse: Response indicating that the storage was updated successfully.
+
+    Raises:
+        HTTPException: If the storage is not found.
+    """
     updated_storage_id = await update_storage_by_id(storage_id, storage_data, database, uow)
     if not updated_storage_id:
         raise HTTPException(status_code=404, detail="Storage not found")
@@ -60,6 +90,15 @@ async def delete_storage(
         database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()],
 ) -> DeleteStorageResponse:
+    """
+    Delete a specific storage by its ID.
+
+    Returns:
+        DeleteStorageResponse: Response indicating whether the storage was successfully deleted.
+
+    Raises:
+        HTTPException: If the storage is not found.
+    """
     deleted_storage_id = await delete_storage_by_id(storage_id, database, uow)
     if not deleted_storage_id:
         raise HTTPException(status_code=404, detail="Storage not found")
