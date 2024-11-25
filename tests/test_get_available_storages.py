@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -8,7 +10,11 @@ from app.application.models.storage_current_level import StorageCurrentLevel
 
 
 @pytest.mark.asyncio
-async def test_get_available_storages(client: TestClient, mock_organization_gateway, mock_storage_gateway):
+async def test_get_available_storages(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -68,7 +74,11 @@ async def test_get_available_storages(client: TestClient, mock_organization_gate
 
 
 @pytest.mark.asyncio
-async def test_get_available_storages_no_suitable(client: TestClient, mock_organization_gateway, mock_storage_gateway):
+async def test_get_available_storages_no_suitable(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -124,8 +134,11 @@ async def test_get_available_storages_no_suitable(client: TestClient, mock_organ
 
 
 @pytest.mark.asyncio
-async def test_get_available_storages_several_waste_types(client: TestClient, mock_organization_gateway,
-                                                          mock_storage_gateway):
+async def test_get_available_storages_several_waste_types(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -209,8 +222,11 @@ async def test_get_available_storages_several_waste_types(client: TestClient, mo
 
 
 @pytest.mark.asyncio
-async def test_get_available_storages_organization_not_found(client: TestClient, mock_organization_gateway,
-                                                             mock_storage_gateway):
+async def test_get_available_storages_organization_not_found(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = None
 
     response = client.get("/organizations/1/available-storages/")

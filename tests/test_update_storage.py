@@ -1,9 +1,15 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from starlette.testclient import TestClient
 
 
 @pytest.mark.asyncio
-async def test_update_storage(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_update_storage(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_storage_gateway.update_storage_by_id.return_value = 1
     storage_data = {
         "name": "Updated Storage",
@@ -20,7 +26,11 @@ async def test_update_storage(client: TestClient, mock_storage_gateway, mock_uow
 
 
 @pytest.mark.asyncio
-async def test_update_storage_not_found(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_update_storage_not_found(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_storage_gateway.update_storage_by_id.return_value = None
     storage_data = {
         "name": "Updated Storage",
@@ -36,7 +46,11 @@ async def test_update_storage_not_found(client: TestClient, mock_storage_gateway
 
 
 @pytest.mark.asyncio
-async def test_update_storage_missing_fields(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_update_storage_missing_fields(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     invalid_storage_data = {"name": "Updated Storage"}
 
     response = client.put("/storages/1/", json=invalid_storage_data)

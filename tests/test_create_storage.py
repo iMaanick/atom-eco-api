@@ -1,9 +1,15 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from starlette.testclient import TestClient
 
 
 @pytest.mark.asyncio
-async def test_create_storage(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_create_storage(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_storage_gateway.create_storage.return_value = 1
     storage_data = {
         "name": "Storage 1",
@@ -19,7 +25,11 @@ async def test_create_storage(client: TestClient, mock_storage_gateway, mock_uow
 
 
 @pytest.mark.asyncio
-async def test_create_storage_missing_fields(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_create_storage_missing_fields(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     invalid_storage_data = {"name": "Storage 1"}
 
     response = client.post("/storages/", json=invalid_storage_data)

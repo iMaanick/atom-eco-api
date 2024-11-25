@@ -1,11 +1,18 @@
+from unittest.mock import AsyncMock
+
 import pytest
+from starlette.testclient import TestClient
 
 from app.application.models import Organization, OrganizationWaste, WasteType
 from app.application.models.storage import Storage
 
 
 @pytest.mark.asyncio
-async def test_get_distance_to_storage(client, mock_organization_gateway, mock_storage_gateway):
+async def test_get_distance_to_storage(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -31,7 +38,10 @@ async def test_get_distance_to_storage(client, mock_organization_gateway, mock_s
 
 
 @pytest.mark.asyncio
-async def test_get_distance_to_storage_organization_not_found(client, mock_organization_gateway):
+async def test_get_distance_to_storage_organization_not_found(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = None
 
     response = client.get("/organizations/999/distance-to-storage/2/")
@@ -41,7 +51,10 @@ async def test_get_distance_to_storage_organization_not_found(client, mock_organ
 
 
 @pytest.mark.asyncio
-async def test_get_distance_to_storage_storage_not_found(client, mock_storage_gateway):
+async def test_get_distance_to_storage_storage_not_found(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock
+) -> None:
     mock_storage_gateway.get_storage_by_id.return_value = None
 
     response = client.get("/organizations/999/distance-to-storage/2/")

@@ -1,8 +1,11 @@
+from unittest.mock import AsyncMock
+
 import pytest
+from starlette.testclient import TestClient
 
 
 @pytest.mark.asyncio
-async def test_delete_organization(client, mock_organization_gateway):
+async def test_delete_organization(client: TestClient, mock_organization_gateway: AsyncMock) -> None:
     mock_organization_gateway.delete_organization_by_id.return_value = 1
 
     response = client.delete("/organizations/", params={"organization_id": 1})
@@ -12,7 +15,7 @@ async def test_delete_organization(client, mock_organization_gateway):
 
 
 @pytest.mark.asyncio
-async def test_delete_organization_not_found(client, mock_organization_gateway):
+async def test_delete_organization_not_found(client: TestClient, mock_organization_gateway: AsyncMock) -> None:
     mock_organization_gateway.delete_organization_by_id.return_value = None
 
     response = client.delete("/organizations/", params={"organization_id": 999})

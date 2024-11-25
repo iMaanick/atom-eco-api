@@ -1,9 +1,15 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from fastapi.testclient import TestClient
 
 
 @pytest.mark.asyncio
-async def test_generate_waste(client: TestClient, mock_organization_gateway, mock_uow):
+async def test_generate_waste(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_organization_gateway.generate_waste.return_value = None
     params = {
         "waste_type": "BIO_WASTE",
@@ -18,7 +24,11 @@ async def test_generate_waste(client: TestClient, mock_organization_gateway, moc
 
 
 @pytest.mark.asyncio
-async def test_generate_waste_not_found(client: TestClient, mock_organization_gateway, mock_uow):
+async def test_generate_waste_not_found(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = None
     params = {
         "waste_type": "BIO_WASTE",

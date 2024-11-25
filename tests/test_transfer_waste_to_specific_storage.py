@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from fastapi.testclient import TestClient
 
 from app.application.models import OrganizationWaste, WasteType, Organization
@@ -10,8 +11,13 @@ from app.application.models.storage_current_level import StorageCurrentLevel
 
 
 @pytest.mark.asyncio
-async def test_transfer_waste_to_specific_storage(client: TestClient, mock_organization_gateway, mock_storage_gateway,
-                                                  mock_uow, monkeypatch):
+async def test_transfer_waste_to_specific_storage(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_transfer_waste = AsyncMock(return_value=None)
     monkeypatch.setattr("app.api.organizations.transfer_waste", mock_transfer_waste)
 
@@ -56,8 +62,13 @@ async def test_transfer_waste_to_specific_storage(client: TestClient, mock_organ
 
 
 @pytest.mark.asyncio
-async def test_organization_not_found(client: TestClient, mock_organization_gateway, mock_storage_gateway, mock_uow,
-                                      monkeypatch):
+async def test_organization_not_found(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = None
     transfer_request = {
         "waste_type": "BIO_WASTE",
@@ -69,8 +80,13 @@ async def test_organization_not_found(client: TestClient, mock_organization_gate
 
 
 @pytest.mark.asyncio
-async def test_storage_not_found(client: TestClient, mock_organization_gateway, mock_storage_gateway, mock_uow,
-                                 monkeypatch):
+async def test_storage_not_found(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -89,8 +105,13 @@ async def test_storage_not_found(client: TestClient, mock_organization_gateway, 
 
 
 @pytest.mark.asyncio
-async def test_storage_does_not_support_waste_type(client: TestClient, mock_organization_gateway, mock_storage_gateway,
-                                                   mock_uow, monkeypatch):
+async def test_storage_does_not_support_waste_type(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -116,8 +137,13 @@ async def test_storage_does_not_support_waste_type(client: TestClient, mock_orga
 
 
 @pytest.mark.asyncio
-async def test_storage_insufficient_capacity(client: TestClient, mock_organization_gateway, mock_storage_gateway,
-                                             mock_uow, monkeypatch):
+async def test_storage_insufficient_capacity(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -143,8 +169,13 @@ async def test_storage_insufficient_capacity(client: TestClient, mock_organizati
 
 
 @pytest.mark.asyncio
-async def test_organization_does_not_generate_waste_type(client: TestClient, mock_organization_gateway,
-                                                         mock_storage_gateway, mock_uow, monkeypatch):
+async def test_organization_does_not_generate_waste_type(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",
@@ -170,8 +201,13 @@ async def test_organization_does_not_generate_waste_type(client: TestClient, moc
 
 
 @pytest.mark.asyncio
-async def test_organization_insufficient_waste(client: TestClient, mock_organization_gateway, mock_storage_gateway,
-                                               mock_uow, monkeypatch):
+async def test_organization_insufficient_waste(
+        client: TestClient,
+        mock_organization_gateway: AsyncMock,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock,
+        monkeypatch: MonkeyPatch
+) -> None:
     mock_organization_gateway.get_organization_by_id.return_value = Organization(
         id=1,
         name="Org 1",

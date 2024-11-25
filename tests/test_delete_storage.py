@@ -1,9 +1,15 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from starlette.testclient import TestClient
 
 
 @pytest.mark.asyncio
-async def test_delete_storage(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_delete_storage(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_storage_gateway.delete_storage_by_id.return_value = 1
 
     response = client.delete("/storages/1/")
@@ -12,7 +18,11 @@ async def test_delete_storage(client: TestClient, mock_storage_gateway, mock_uow
 
 
 @pytest.mark.asyncio
-async def test_delete_storage_not_found(client: TestClient, mock_storage_gateway, mock_uow):
+async def test_delete_storage_not_found(
+        client: TestClient,
+        mock_storage_gateway: AsyncMock,
+        mock_uow: AsyncMock
+) -> None:
     mock_storage_gateway.delete_storage_by_id.return_value = None
 
     response = client.delete("/storages/999/")

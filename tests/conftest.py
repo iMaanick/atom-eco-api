@@ -9,13 +9,13 @@ from app.main import init_routers
 
 
 @pytest.fixture
-def mock_organization_gateway():
+def mock_organization_gateway() -> OrganizationDatabaseGateway:
     mock = AsyncMock(OrganizationDatabaseGateway)
     return mock
 
 
 @pytest.fixture
-def mock_storage_gateway():
+def mock_storage_gateway() -> StorageDatabaseGateway:
     mock = AsyncMock(StorageDatabaseGateway)
     return mock
 
@@ -29,7 +29,7 @@ def mock_uow() -> UoW:
 
 
 @pytest.fixture
-def client(mock_organization_gateway, mock_storage_gateway, mock_uow):
+def client(mock_organization_gateway: AsyncMock, mock_storage_gateway: AsyncMock, mock_uow: AsyncMock) -> TestClient:
     app = FastAPI()
     init_routers(app)
     app.dependency_overrides[OrganizationDatabaseGateway] = lambda: mock_organization_gateway

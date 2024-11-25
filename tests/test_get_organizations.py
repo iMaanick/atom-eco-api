@@ -1,10 +1,13 @@
+from unittest.mock import AsyncMock
+
 import pytest
+from starlette.testclient import TestClient
 
 from app.application.models import Organization, OrganizationWaste, WasteType
 
 
 @pytest.mark.asyncio
-async def test_get_organizations(client, mock_organization_gateway):
+async def test_get_organizations(client: TestClient, mock_organization_gateway: AsyncMock) -> None:
     mock_organization_gateway.get_organizations.return_value = [
         Organization(id=1, name="Org 1", location_x=0, location_y=0, generated_waste=[
             OrganizationWaste(waste_type=WasteType.BIO_WASTE, amount=1, )
@@ -25,7 +28,7 @@ async def test_get_organizations(client, mock_organization_gateway):
 
 
 @pytest.mark.asyncio
-async def test_get_organizations_empty(client, mock_organization_gateway):
+async def test_get_organizations_empty(client: TestClient, mock_organization_gateway: AsyncMock) -> None:
     mock_organization_gateway.get_organizations.return_value = []
 
     response = client.get("/organizations/")
