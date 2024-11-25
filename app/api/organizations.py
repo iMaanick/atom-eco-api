@@ -21,6 +21,12 @@ organizations_router = APIRouter()
 async def get_organizations(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
 ) -> list[Organization]:
+    """
+    Retrieve a list of all organizations.
+
+    Returns:
+        list[Organization]: A list of organization objects.
+    """
     organization_list = await get_organizations_data(database)
     return organization_list
 
@@ -30,6 +36,15 @@ async def get_organization(
         organization_id: int,
         database: Annotated[OrganizationDatabaseGateway, Depends()],
 ) -> Organization:
+    """
+    Retrieve a single organization by its ID.
+
+    Returns:
+        Organization: The organization object corresponding to the specified ID.
+
+    Raises:
+        HTTPException: If the organization is not found.
+    """
     organization = await get_organization_data(organization_id, database)
     if not organization:
         raise HTTPException(status_code=404, detail="Data not found for specified organization_id.")
@@ -42,6 +57,12 @@ async def create_organization(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> OrganizationCreateResponse:
+    """
+    Create a new organization.
+
+    Returns:
+        OrganizationCreateResponse: Response containing the ID of the newly created organization.
+    """
     organization_id = await add_organization(organization_data, database, uow)
     return OrganizationCreateResponse(organization_id=organization_id)
 
@@ -52,6 +73,15 @@ async def delete_organization_by_id(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> DeleteOrganizationResponse:
+    """
+    Delete an organization by its ID.
+
+    Returns:
+        DeleteOrganizationResponse: Response indicating whether the organization was successfully deleted.
+
+    Raises:
+        HTTPException: If the organization is not found.
+    """
     deleted_organization_id = await delete_organization(organization_id, database, uow)
     if not deleted_organization_id:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -65,10 +95,19 @@ async def update_organization(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()],
 ) -> UpdateOrganizationResponse:
+    """
+    Update an existing organization's details by its ID.
+
+    Returns:
+        UpdateOrganizationResponse: Response indicating that the organization was updated.
+
+    Raises:
+        HTTPException: If the organization is not found.
+    """
     updated_organization_id = await update_organization_by_id(organization_id,
-                                                      organization_data,
-                                                      database,
-                                                      uow)
+                                                              organization_data,
+                                                              database,
+                                                              uow)
     if not updated_organization_id:
         raise HTTPException(status_code=404, detail="Organization not found")
     return UpdateOrganizationResponse(detail="Organization updated successfully")
@@ -81,6 +120,15 @@ async def get_distance_to_storage(
         organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
         storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
 ) -> DistanceResponse:
+    """
+    Calculate the distance from an organization to a specific storage.
+
+    Returns:
+        DistanceResponse: The calculated distance between the organization and storage.
+
+    Raises:
+        HTTPException: If either the organization or storage is not found.
+    """
     distance = await calculate_distance_to_storage(organization_id, storage_id, organization_database, storage_database)
     if distance is None:
         raise HTTPException(status_code=404, detail="Invalid organization or storage")
@@ -93,6 +141,15 @@ async def get_available_storages(
         organization_database: Annotated[OrganizationDatabaseGateway, Depends()],
         storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
 ) -> list[AvailableStorageResponse]:
+    """
+    Get a list of available storages for a specific organization.
+
+    Returns:
+        list[AvailableStorageResponse]: A list of available storages with details like distance and capacities.
+
+    Raises:
+        HTTPException: If the organization is not found.
+    """
     organization = await get_organization_data(organization_id, organization_database)
     if not organization:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -112,6 +169,15 @@ async def transfer_waste_to_specific_storage(
         storage_database: Annotated[StorageDatabaseGateway, Depends(Stub(StorageDatabaseGateway))],
         uow: Annotated[UoW, Depends()]
 ) -> WasteTransferResponse:
+    """
+    Transfer waste from an organization to a specific storage.
+
+    Returns:
+        WasteTransferResponse: Response indicating the success of the waste transfer.
+
+    Raises:
+        HTTPException: If any validation fails (e.g., insufficient capacity, invalid waste type).
+    """
     organization = await get_organization_data(organization_id, organization_database)
     if not organization:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -174,6 +240,15 @@ async def generate_waste(
         database: Annotated[OrganizationDatabaseGateway, Depends()],
         uow: Annotated[UoW, Depends()]
 ) -> GenerateWasteResponse:
+    """
+    Generate a specific amount of waste for an organization.
+
+    Returns:
+        GenerateWasteResponse: Response indicating the successful generation of waste.
+
+    Raises:
+        HTTPException: If the organization is not found.
+    """
     organization = await get_organization_data(organization_id, database)
     if not organization:
         raise HTTPException(status_code=404, detail="Organization not found")
